@@ -12,6 +12,7 @@
  */
 
 import * as StellarSdk from "@stellar/stellar-sdk";
+import { CURRENT_NETWORK_CONFIG } from "./constants";
 
 export const HORIZON_URLS = {
   testnet: "https://horizon-testnet.stellar.org",
@@ -25,38 +26,15 @@ export const SOROBAN_RPC_URLS = {
 
 export type StellarNetwork = keyof typeof HORIZON_URLS;
 
-export const NETWORK = {
-  testnet: {
-    networkPassphrase: StellarSdk.Networks.TESTNET,
-    sorobanRpcUrl:
-      process.env.NEXT_PUBLIC_STELLAR_RPC_URL || SOROBAN_RPC_URLS.testnet,
-    horizonUrl:
-      process.env.NEXT_PUBLIC_STELLAR_HORIZON_URL || HORIZON_URLS.testnet,
-  },
-  mainnet: {
-    networkPassphrase: StellarSdk.Networks.PUBLIC,
-    sorobanRpcUrl:
-      process.env.NEXT_PUBLIC_STELLAR_RPC_URL || SOROBAN_RPC_URLS.mainnet,
-    horizonUrl:
-      process.env.NEXT_PUBLIC_STELLAR_HORIZON_URL || HORIZON_URLS.mainnet,
-  },
-};
-
-// Active network driven by NEXT_PUBLIC_STELLAR_NETWORK
-const activeNetwork =
-  process.env.NEXT_PUBLIC_STELLAR_NETWORK === "mainnet"
-    ? NETWORK.mainnet
-    : NETWORK.testnet;
-
 export const sorobanServer = new StellarSdk.rpc.Server(
-  activeNetwork.sorobanRpcUrl,
+  CURRENT_NETWORK_CONFIG.rpcUrl,
 );
 
 export const horizonServer = new StellarSdk.Horizon.Server(
-  activeNetwork.horizonUrl,
+  CURRENT_NETWORK_CONFIG.horizonUrl,
 );
 
-export const networkPassphrase = activeNetwork.networkPassphrase;
+export const networkPassphrase = CURRENT_NETWORK_CONFIG.networkPassphrase;
 
 export type StellarErrorCode =
   | "WALLET_NOT_FOUND"

@@ -78,48 +78,36 @@ jobs:
 
                     # Extract labels from the **Labels:** line
                     LABELS_LINE=$(grep '^\*\*Labels:\*\*' "$file" || true)
-                    LABEL_ARGS=""
+                    LABEL_ARGS=()
                     if [ -n "$LABELS_LINE" ]; then
-                      # Parse backtick-wrapped labels: `label1`, `label2`
-                      LABELS=$(echo "$LABELS_LINE" | grep -oP '`\K[^`]+' | paste -sd ',' -)
-                      if [ -n "$LABELS" ]; then
-                        LABEL_ARGS="--label $LABELS"
-                      fi
+                      while IFS= read -r label; do
+                        LABEL_ARGS+=(--label "$label")
+                      done < <(grep -oP '`\K[^`]+' <<< "$LABELS_LINE" || true)
                     fi
 
                     # Extract milestone from the **Milestone:** line
                     MILESTONE_LINE=$(grep '^\*\*Milestone:\*\*' "$file" || true)
-                    MILESTONE_ARGS=""
+                    MILESTONE=""
                     if [ -n "$MILESTONE_LINE" ]; then
                       MILESTONE=$(echo "$MILESTONE_LINE" | sed 's/\*\*Milestone:\*\* //' | xargs)
-                      if [ -n "$MILESTONE" ]; then
-                        MILESTONE_ARGS="--milestone $MILESTONE"
-                      fi
                     fi
 
                     # Use the full file content as the issue body
                     BODY=$(cat "$file")
 
+                    CREATE_ARGS=(--title "$TITLE" --body "$BODY")
+                    CREATE_ARGS+=("${LABEL_ARGS[@]}")
+                    if [ -n "$MILESTONE" ]; then
+                      CREATE_ARGS+=(--milestone "$MILESTONE")
+                    fi
+
                     # Create the issue
-                    if gh issue create \
-                      --title "$TITLE" \
-                      --body "$BODY" \
-                      $LABEL_ARGS \
-                      2>/dev/null; then
+                    if gh issue create "${CREATE_ARGS[@]}"; then
                       echo "✅ Created: $TITLE"
                       CREATED=$((CREATED + 1))
                     else
-                      # Retry without labels (labels may not exist yet)
-                      if gh issue create \
-                        --title "$TITLE" \
-                        --body "$BODY" \
-                        2>/dev/null; then
-                        echo "✅ Created (without labels): $TITLE"
-                        CREATED=$((CREATED + 1))
-                      else
-                        echo "❌ Failed to create: $TITLE"
-                        FAILED=$((FAILED + 1))
-                      fi
+                      echo "❌ Failed to create: $TITLE"
+                      FAILED=$((FAILED + 1))
                     fi
 
                     # Rate limit: small delay between API calls

@@ -40,9 +40,17 @@ export const PREDICTION_MARKET_CONTRACT =
   "";
 
 export const POLL_CONTRACT =
-  process.env.NEXT_PUBLIC_CONTRACT_POLL ||
-  process.env.NEXT_PUBLIC_CONTRACT_ID ||
-  "";
+  process.env.NEXT_PUBLIC_CONTRACT_POLL || "";
+
+function requirePollContract(): string {
+  if (!POLL_CONTRACT) {
+    throw new StellarError(
+      "Poll contract ID is not configured. Set NEXT_PUBLIC_CONTRACT_POLL before using live poll operations.",
+      "NETWORK_ERROR",
+    );
+  }
+  return POLL_CONTRACT;
+}
 
 export interface TransactionResult {
   status: "SUCCESS" | "FAILED" | "PENDING";
@@ -232,14 +240,15 @@ export async function executeContractCall(
 // ─── Read Operations ───────────────────────────────────────────────
 
 /**
- * Fetches all polls. Falls back to mock polls when USE_MOCK is true or contract is unset.
+ * Fetches all polls. Uses mock polls when USE_MOCK is true.
  */
 export async function getPolls(): Promise<Poll[]> {
-  if (USE_MOCK || !POLL_CONTRACT) {
+  if (USE_MOCK) {
     return DOMAIN_POLLS;
   }
+  const pollContract = requirePollContract();
   try {
-    const contract = new StellarSdk.Contract(POLL_CONTRACT);
+    const contract = new StellarSdk.Contract(pollContract);
     // Simulation call for read operation
     const tx = new StellarSdk.TransactionBuilder(
       new StellarSdk.Account("GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN7", "0"),
@@ -263,14 +272,15 @@ export async function getPolls(): Promise<Poll[]> {
 }
 
 /**
- * Fetches a single poll by ID. Falls back to mock data if USE_MOCK is true or contract is unset.
+ * Fetches a single poll by ID. Uses mock data when USE_MOCK is true.
  */
 export async function getPollById(pollId: string): Promise<Poll | null> {
-  if (USE_MOCK || !POLL_CONTRACT) {
+  if (USE_MOCK) {
     return DOMAIN_POLLS.find((p) => p.id === pollId) || null;
   }
+  const pollContract = requirePollContract();
   try {
-    const contract = new StellarSdk.Contract(POLL_CONTRACT);
+    const contract = new StellarSdk.Contract(pollContract);
     const tx = new StellarSdk.TransactionBuilder(
       new StellarSdk.Account("GAAZI4TCR3TY5OJHCTJC2A4QSY6CJWJH5IAJTGKIN2ER7LBNVKOCCWN7", "0"),
       { fee: "100", networkPassphrase }
@@ -374,12 +384,13 @@ export async function createPoll(
   options: string[],
   stakeAmount: number,
 ): Promise<TransactionResult> {
-  if (USE_MOCK || !POLL_CONTRACT) {
+  if (USE_MOCK) {
     return {
       status: "SUCCESS",
       hash: "mock_tx_" + Math.random().toString(36).substring(2, 10),
     };
   }
+  const pollContract = requirePollContract();
 
   const args = [
     new StellarSdk.Address(creatorPublicKey).toScVal(),
@@ -389,7 +400,7 @@ export async function createPoll(
     StellarSdk.nativeToScVal(xlmToStroops(stakeAmount), { type: "i128" }),
   ];
 
-  return executeContractCall(creatorPublicKey, POLL_CONTRACT, "create_poll", args);
+  return executeContractCall(creatorPublicKey, pollContract, "create_poll", args);
 }
 
 /**
@@ -431,12 +442,13 @@ export async function castVote(
   pollId: string,
   optionIndex: number,
 ): Promise<TransactionResult> {
-  if (USE_MOCK || !POLL_CONTRACT) {
+  if (USE_MOCK) {
     return {
       status: "SUCCESS",
       hash: "mock_tx_" + Math.random().toString(36).substring(2, 10),
     };
   }
+  const pollContract = requirePollContract();
 
   const args = [
     new StellarSdk.Address(userPublicKey).toScVal(),
@@ -444,7 +456,7 @@ export async function castVote(
     StellarSdk.nativeToScVal(optionIndex, { type: "u32" }),
   ];
 
-  return executeContractCall(userPublicKey, POLL_CONTRACT, "cast_vote", args);
+  return executeContractCall(userPublicKey, pollContract, "cast_vote", args);
 }
 
 /**

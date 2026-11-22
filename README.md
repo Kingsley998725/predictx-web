@@ -66,16 +66,30 @@ Create a `.env.local` file in the project root with the following variables:
 
 ```env
 NEXT_PUBLIC_STELLAR_NETWORK=testnet
+NEXT_PUBLIC_STELLAR_TESTNET_HORIZON_URL=https://horizon-testnet.stellar.org
+NEXT_PUBLIC_STELLAR_TESTNET_RPC_URL=https://soroban-testnet.stellar.org
+NEXT_PUBLIC_STELLAR_TESTNET_NETWORK_PASSPHRASE="Test SDF Network ; September 2015"
+NEXT_PUBLIC_STELLAR_TESTNET_EXPLORER_URL=https://stellar.expert/explorer/testnet
+NEXT_PUBLIC_STELLAR_MAINNET_HORIZON_URL=https://horizon.stellar.org
+NEXT_PUBLIC_STELLAR_MAINNET_RPC_URL=https://soroban-rpc.mainnet.stellar.org
+NEXT_PUBLIC_STELLAR_MAINNET_NETWORK_PASSPHRASE="Public Global Stellar Network ; July 2015"
+NEXT_PUBLIC_STELLAR_MAINNET_EXPLORER_URL=https://stellar.expert/explorer/public
 NEXT_PUBLIC_CONTRACT_PREDICTION_MARKET=CABC...XYZ
 NEXT_PUBLIC_CONTRACT_POLL=CDEF...UVW
 NEXT_PUBLIC_USE_MOCK_DATA=true
 ```
 
+The endpoint, passphrase, and explorer settings are optional and are kept
+separate for each network. Switching `NEXT_PUBLIC_STELLAR_NETWORK` uses only
+the matching network's settings, so testnet values cannot override mainnet.
+
 | Variable | Description |
 |----------|-------------|
 | `NEXT_PUBLIC_STELLAR_NETWORK` | Stellar network to target (`testnet` or `mainnet`) |
+| `NEXT_PUBLIC_STELLAR_TESTNET_*` | Optional testnet Horizon, RPC, passphrase, and explorer settings |
+| `NEXT_PUBLIC_STELLAR_MAINNET_*` | Optional mainnet Horizon, RPC, passphrase, and explorer settings |
 | `NEXT_PUBLIC_CONTRACT_PREDICTION_MARKET` | Soroban prediction market contract ID |
-| `NEXT_PUBLIC_CONTRACT_POLL` | Soroban poll contract ID |
+| `NEXT_PUBLIC_CONTRACT_POLL` | Soroban poll contract ID (required for live poll operations) |
 | `NEXT_PUBLIC_USE_MOCK_DATA` | When `true`, use local mock data instead of on-chain state |
 
 ## Freighter Wallet Setup

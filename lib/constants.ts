@@ -76,42 +76,6 @@ export interface NetworkConfig {
   contractId: string;
 }
 
-export const STELLAR_NETWORKS: Record<StellarNetwork, NetworkConfig> = {
-  testnet: {
-    network: "testnet",
-    horizonUrl:
-      process.env.NEXT_PUBLIC_STELLAR_HORIZON_URL ||
-      "https://horizon-testnet.stellar.org",
-    rpcUrl:
-      process.env.NEXT_PUBLIC_STELLAR_RPC_URL ||
-      "https://soroban-testnet.stellar.org",
-    networkPassphrase:
-      process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE ||
-      "Test SDF Network ; September 2015",
-    explorerUrl:
-      process.env.NEXT_PUBLIC_STELLAR_EXPLORER_URL ||
-      "https://stellar.expert/explorer/testnet",
-    contractId:
-      process.env.NEXT_PUBLIC_CONTRACT_ID ||
-      "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
-  },
-  mainnet: {
-    network: "mainnet",
-    horizonUrl:
-      process.env.NEXT_PUBLIC_STELLAR_HORIZON_URL ||
-      "https://horizon.stellar.org",
-    rpcUrl:
-      process.env.NEXT_PUBLIC_STELLAR_RPC_URL ||
-      "https://soroban-rpc.mainnet.stellar.org",
-    networkPassphrase:
-      process.env.NEXT_PUBLIC_STELLAR_NETWORK_PASSPHRASE ||
-      "Public Global Stellar Network ; July 2015",
-    explorerUrl:
-      process.env.NEXT_PUBLIC_STELLAR_EXPLORER_URL ||
-      "https://stellar.expert/explorer/public",
-    contractId: process.env.NEXT_PUBLIC_CONTRACT_ID || "",
-  },
-};
 /**
  * Stellar network used for all blockchain interactions.
  * Driven by NEXT_PUBLIC_STELLAR_NETWORK env variable, defaulting to "testnet".
@@ -120,6 +84,43 @@ export const STELLAR_NETWORK: StellarNetwork =
   (process.env.NEXT_PUBLIC_STELLAR_NETWORK as StellarNetwork) === "mainnet"
     ? "mainnet"
     : "testnet";
+
+export const STELLAR_NETWORKS: Record<StellarNetwork, NetworkConfig> = {
+  testnet: {
+    network: "testnet",
+    horizonUrl:
+      process.env.NEXT_PUBLIC_STELLAR_TESTNET_HORIZON_URL ||
+      "https://horizon-testnet.stellar.org",
+    rpcUrl:
+      process.env.NEXT_PUBLIC_STELLAR_TESTNET_RPC_URL ||
+      "https://soroban-testnet.stellar.org",
+    networkPassphrase:
+      process.env.NEXT_PUBLIC_STELLAR_TESTNET_NETWORK_PASSPHRASE ||
+      "Test SDF Network ; September 2015",
+    explorerUrl:
+      process.env.NEXT_PUBLIC_STELLAR_TESTNET_EXPLORER_URL ||
+      "https://stellar.expert/explorer/testnet",
+    contractId:
+      process.env.NEXT_PUBLIC_CONTRACT_ID ||
+      "CDLZFC3SYJYDZT7K67VZ75HPJVIEUVNIXF47ZG2FB2RMQQVU2HHGCYSC",
+  },
+  mainnet: {
+    network: "mainnet",
+    horizonUrl:
+      process.env.NEXT_PUBLIC_STELLAR_MAINNET_HORIZON_URL ||
+      "https://horizon.stellar.org",
+    rpcUrl:
+      process.env.NEXT_PUBLIC_STELLAR_MAINNET_RPC_URL ||
+      "https://soroban-rpc.mainnet.stellar.org",
+    networkPassphrase:
+      process.env.NEXT_PUBLIC_STELLAR_MAINNET_NETWORK_PASSPHRASE ||
+      "Public Global Stellar Network ; July 2015",
+    explorerUrl:
+      process.env.NEXT_PUBLIC_STELLAR_MAINNET_EXPLORER_URL ||
+      "https://stellar.expert/explorer/public",
+    contractId: process.env.NEXT_PUBLIC_CONTRACT_ID || "",
+  },
+};
 
 /**
  * Active network configuration derived from STELLAR_NETWORK and environment variables.
